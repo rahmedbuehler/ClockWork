@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block title %}<title>ClockWork</title>{% endblock %}
+    <meta charset="utf-8">
+    <meta name="keywords" content="Productivity, Time Management">
+    <meta name="description" content="A web application for tracking work time.">
+    {% load static %}
+    <script src="https://kit.fontawesome.com/34a33e2e3c.js" crossorigin="anonymous"></script>
+    {% block head-add %}{% endblock %}
+</head>
+<body class="body-style">
+    <div id="header-wrapper" class="header-style-1">
+    </div>
+    <i class="far fa-clock"></i>
+<div class="footer">
+    <a href="https://github.com/11000001/ClockWork/issues" class="footer-link">
+        <i class="fas fa-envelope-square"></i>
+    </a>
+    <a href="https://github.com/11000001/ClockWork" class="footer-link">
+        <i class="fab fa-github"></i>
+    </a>
+</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>
