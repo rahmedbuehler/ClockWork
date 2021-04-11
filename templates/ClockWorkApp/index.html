@@ -1,26 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% block title %}<title>ClockWork</title>{% endblock %}
-    <meta charset="utf-8">
-    <meta name="keywords" content="Productivity, Time Management">
-    <meta name="description" content="A web application for tracking work time.">
-    {% load static %}
-    <script src="https://kit.fontawesome.com/34a33e2e3c.js" crossorigin="anonymous"></script>
-    {% block head-add %}{% endblock %}
-</head>
-<body class="body-style">
-    <div id="header-wrapper" class="header-style-1">
+{% extends "simple.html" %}
+
+{% load static %}
+
+{% block header %}
+    <div id="title" class="header-line-height noselect">
+        Cl<span id="header-icon" class="material-icons md-bf">schedule</span>ckWork
+        <div id="btn-wrapper-right">
+            <span class="material-icons md-bf">login</span>
+        </div>
     </div>
-    <i class="far fa-clock"></i>
-<div class="footer">
-    <a href="https://github.com/11000001/ClockWork/issues" class="footer-link">
-        <i class="fas fa-envelope-square"></i>
-    </a>
-    <a href="https://github.com/11000001/ClockWork" class="footer-link">
-        <i class="fab fa-github"></i>
-    </a>
+{% endblock %}
+
+{% block content %}
+<div class="main">
+    <div class="left-column">
+        <table>
+            <thead>
+            <tr>
+                <td></td>
+                <th scope="col">Monday</th>
+                <th scope="col">Tuesday</th>
+                <th scope="col">Wednesday</th>
+                <th scope="col">Thursday</th>
+                <th scope="col">Friday</th>
+                <th scope="col">Saturday</th>
+                <th scope="col">Sunday</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for time in times %}
+            <tr>
+                <th>{{ time }}</th>
+                {% for ch in '0123456' %}
+                <td></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="right-column">
+        <span class="material-icons md-72 md-bf">timer</span>
+
+        <span class="material-icons md-72 md-bf">timer_off</span>
+    </div>
 </div>
-{% block scripts %}{% endblock %}
-</body>
-</html>
+{% endblock %}

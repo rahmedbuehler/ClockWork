@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth import login, authenticate, logout
 from django.utils import timezone
 from django.views import View
-
+import datetime
 import os
 GUEST_PASSWORD = os.environ["GUEST_PASSWORD"]
 
@@ -25,9 +25,14 @@ class Index_view(View):
     
     def get(self, request):
         context = {}
+        context["times"] = [str(i)+"am" for i in range(5,12)] + ["12pm"] + [str(i)+"pm" for i in range(1,12)] + ["12am"] + [str(i)+"am" for i in range(1,5)]
+        if not request.user.is_authenticated:
+            user = authenticate(request, username="guest", password=GUEST_PASSWORD)
+            if user is not None:
+                login(request, user)
         days = list(Day.objects.filter(owner=request.user).order_by('-date'))
         if not days:
-            raise Http404("No available data.")
+            days = [Day.objects.create(owner=request.user, date=datetime.date.today())]
         return render(request, "ClockWorkApp/index.html", context)
 
 def new_account_view(request):
