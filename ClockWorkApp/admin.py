@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Day
+from .models import User, Week, Day, Profile
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Day)
+admin.site.register(Week)
+admin.site.register(Profile)

@@ -26,13 +26,25 @@ class Index_view(View):
     def get(self, request):
         context = {}
         context["times"] = [str(i)+"am" for i in range(5,12)] + ["12pm"] + [str(i)+"pm" for i in range(1,12)] + ["12am"] + [str(i)+"am" for i in range(1,5)]
+        # Login as guest if not already authenticated and show login icon
         if not request.user.is_authenticated:
             user = authenticate(request, username="guest", password=GUEST_PASSWORD)
+            context["login_display"] = 'show'
             if user is not None:
                 login(request, user)
-        days = list(Day.objects.filter(owner=request.user).order_by('-date'))
-        if not days:
-            days = [Day.objects.create(owner=request.user, date=datetime.date.today())]
+        else:
+            user = request.user
+            context["login_display"] = "noshow"
+        # New User or new week
+        today = datetime.date.today()
+        if not user.profile.latest_week or today not in user.profile.latest_week.date_list:
+            current_week = user.profile.add_week()
+        # Week exists, but no day object for today
+        elif current_week.date_list[today.weekday()] == None:
+            current_week.add_day(today)
+        context["date_list"] = current_week.date_list
+        context["work_list"] = current_week.get_work_list()
+        context["today"] = today.weekday()
         return render(request, "ClockWorkApp/index.html", context)
 
 def new_account_view(request):

@@ -18,6 +18,12 @@
             <thead>
             <tr>
                 <td></td>
+                {% for date in date_list %}
+                    <td>{{ date }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
                 <th scope="col">Monday</th>
                 <th scope="col">Tuesday</th>
                 <th scope="col">Wednesday</th>
