@@ -15,18 +15,8 @@ def logout_view(request):
     return HttpResponseRedirect(reverse('logout'))
 
 class Index_view(View):
-    
-    def get(self, request):
-        context = {}
-        # Login as guest if not already authenticated and show login icon
-        if not request.user.is_authenticated:
-            user = authenticate(request, username="guest", password=GUEST_PASSWORD)
-            context["login_display"] = 'show'
-            if user is not None:
-                login(request, user)
-        else:
-            user = request.user
-            context["login_display"] = "noshow"
+
+    def get_current_week(self, user):
         today = timezone.localdate()
         current_week = user.profile.latest_week
         # New User or new current_week
@@ -35,18 +25,63 @@ class Index_view(View):
         # current_week exists, but no day object for today
         elif current_week.date_list[today.weekday()] == None:
             current_week.add_day(today)
+        return current_week
+    
+    def get(self, request):
+        context = {}
+        # Login as guest if not already authenticated
+        if not request.user.is_authenticated:
+            user = authenticate(request, username="guest", password=GUEST_PASSWORD)
+            if user is not None:
+                login(request, user)
+        else:
+            user = request.user
+        # Show login if guest; account name and settings otherwise
+        if user.username == "guest":
+            context["login_display"] = "show"
+            context["user_display"] = "noshow"
+        else:
+            context["login_display"] = "noshow"
+            context["user_display"] = "show"
+        current_week = self.get_current_week(user)
         context["date_list"] = [date.strftime("%m/%d") for date in current_week.date_list]
         context["week_by_row"] = current_week.get_week_by_row()
         context["goal"] = current_week.goal
         context["work_percent"] = current_week.get_hours_worked() / current_week.goal
         return render(request, "ClockWorkApp/index.html", context)
+
+    def post(self, request):
+        if request.POST["start_time"]:
+            current_week = self.get_current_week(request.user)
+            now = timezone.localtime()
+            if str(timezone.localdate().day) == request.POST["start_day"]:
+                current_day = Day.objects.filter(week=current_week, date=timezone.localdate()).first()
+                start_index = request.POST["start_time"].split(":")
+                start_index = int(start_index[0])*4+int(start_index[-1])//15
+                end_index = 1+now.hour*4+now.minute//15
+                current_day.work = current_day.work[0:start_index]+request.POST["work_code"]*(end_index-start_index)+current_day.work[end_index:]
+                current_day.save()
+            elif str(timezone.localdate().day+1) == request.POST["start_day"]:
+                day_2 = Day.objects.filter(week=current_week, date=timezone.localdate()).first()
+                # Check for change in week
+                if day_2.weekday() == 0:
+                    day_1 = current_week.previous.get_day_list()[-1]
+                else:
+                    day_1 = current_week.get_day_list()[day_2.weekday()-1]
+                start_index = request.POST["start_time"].split(":")
+                start_index = int(start_index[0])*4+int(start_index[-1])//15
+                day_1.work = day_1.work[0:start_index]+request.POST["work_code"]*(96-start_index)
+                end_index = 1+now.hour*4+now.minute//15
+                day_2.work = request.POST["work_code"]*(end_index)+day_2.work[end_index:]
+                day_1.save()
+                day_2.save()
+            return HttpResponseRedirect(reverse("index"))
 '''
 def new_account_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
+            form.save() username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)

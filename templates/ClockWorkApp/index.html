@@ -5,8 +5,11 @@
 {% block header %}
     <div id="title" class="header-line-height noselect">
         Cl<span id="header-icon" class="material-icons md-bf">schedule</span>ckWork
-        <div id="btn-wrapper-right">
+        <div id="btn-wrapper-right" class={{ login_display }}>
             Login <span class="material-icons md-bf">login</span>
+        </div>
+        <div id="btn-wrapper-right" class={{ user_display }}>
+            {{ user.username }} <span class="material-icons md-bf">settings</span>
         </div>
     </div>
 {% endblock %}
@@ -16,13 +19,13 @@
     <div class="left-column hide-scroll">
         <table>
             <thead>
-            <tr>
+            <tr id="dates">
                 <th class="time-width"></th>
                 {% for date in date_list %}
                 <th class="dates">{{ date }}</th>
                 {% endfor %}
             </tr>
-            <tr>
+            <tr id="days">
                 <th></th>
                 <th class="days">Monday</th>
                 <th class="days">Tuesday</th>
@@ -35,17 +38,17 @@
             </thead>
             <tbody>
             {% for row in week_by_row %}
-                <tr>
+                <tr id="row_{{ forloop.counter0 }}">
                     {% if row.0 %}
-                        <td rowspan="4" class="times">{{ row.0 }}</td>
+                        <td id="row_{{ forloop.counter0 }}_time" rowspan="4" class="times">{{ row.0 }}</td>
                     {% endif %}
-                    <td class={{ row.1 }}></td>
-                    <td class={{ row.2 }}></td>
-                    <td class={{ row.3 }}></td>
-                    <td class={{ row.4 }}></td>
-                    <td class={{ row.5 }}></td>
-                    <td class={{ row.6 }}></td>
-                    <td class={{ row.7 }}></td>
+                    <td id="entry_{{ forloop.counter0 }}_1" class={{ row.1 }}></td>
+                    <td id="entry_{{ forloop.counter0 }}_2" class={{ row.2 }}></td>
+                    <td id="entry_{{ forloop.counter0 }}_3" class={{ row.3 }}></td>
+                    <td id="entry_{{ forloop.counter0 }}_4" class={{ row.4 }}></td>
+                    <td id="entry_{{ forloop.counter0 }}_5" class={{ row.5 }}></td>
+                    <td id="entry_{{ forloop.counter0 }}_6" class={{ row.6 }}></td>
+                    <td id="entry_{{ forloop.counter0 }}_7" class={{ row.7 }}></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -55,15 +58,33 @@
         <div id="goal_wrapper">
             <span id="goal"> {{ work_percent }}% of the way to {{ goal }} hours </span>
         </div>
-        <div id="start_timer">
+        <div id="start_timer" onclick="start_timer();">
             <span class="material-icons md-125 md-bf">timer</span>
         </div>
-        <div id="stop_timer" class="noshow">
+        <div id="stop_timer" class="noshow" onclick="document.getElementById('form_id').submit();">
             <span class="material-icons md-125 md-bf">timer_off</span>
         </div>
         <div id="chart">
             CHART HERE
         </div>
     </div>
+    <form id="form_id" method="POST" action="">
+        {% csrf_token %}
+        <input id="start_time_input" type="hidden" name="start_time" value="">
+        <input id="start_day_input" type="hidden" name="start_day" value="">
+        <input id="work_code_input" type="hidden" name="work_code" value="1">
+    </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function start_timer(){
+            let start = new Date();
+            document.getElementById("start_time_input").value = start.getHours()+":"+start.getMinutes();
+            document.getElementById("start_day_input").value = start.getDate();
+            document.getElementById("start_timer").classList.add("noshow");
+            document.getElementById("stop_timer").classList.remove("noshow");
+        }
+    </script>
 {% endblock %}
