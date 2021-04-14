@@ -6,49 +6,64 @@
     <div id="title" class="header-line-height noselect">
         Cl<span id="header-icon" class="material-icons md-bf">schedule</span>ckWork
         <div id="btn-wrapper-right">
-            <span class="material-icons md-bf">login</span>
+            Login <span class="material-icons md-bf">login</span>
         </div>
     </div>
 {% endblock %}
 
 {% block content %}
 <div class="main">
-    <div class="left-column">
+    <div class="left-column hide-scroll">
         <table>
             <thead>
             <tr>
-                <td></td>
+                <th class="time-width"></th>
                 {% for date in date_list %}
-                    <td>{{ date }}</td>
+                <th class="dates">{{ date }}</th>
                 {% endfor %}
             </tr>
             <tr>
-                <td></td>
-                <th scope="col">Monday</th>
-                <th scope="col">Tuesday</th>
-                <th scope="col">Wednesday</th>
-                <th scope="col">Thursday</th>
-                <th scope="col">Friday</th>
-                <th scope="col">Saturday</th>
-                <th scope="col">Sunday</th>
+                <th></th>
+                <th class="days">Monday</th>
+                <th class="days">Tuesday</th>
+                <th class="days">Wednesday</th>
+                <th class="days">Thursday</th>
+                <th class="days">Friday</th>
+                <th class="days">Saturday</th>
+                <th class="days">Sunday</th>
             </tr>
             </thead>
             <tbody>
-            {% for time in times %}
-            <tr>
-                <th>{{ time }}</th>
-                {% for ch in '0123456' %}
-                <td></td>
-                {% endfor %}
-            </tr>
+            {% for row in week_by_row %}
+                <tr>
+                    {% if row.0 %}
+                        <td rowspan="4" class="times">{{ row.0 }}</td>
+                    {% endif %}
+                    <td class={{ row.1 }}></td>
+                    <td class={{ row.2 }}></td>
+                    <td class={{ row.3 }}></td>
+                    <td class={{ row.4 }}></td>
+                    <td class={{ row.5 }}></td>
+                    <td class={{ row.6 }}></td>
+                    <td class={{ row.7 }}></td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-    <div class="right-column">
-        <span class="material-icons md-72 md-bf">timer</span>
-
-        <span class="material-icons md-72 md-bf">timer_off</span>
+    <div class="right-column noselect">
+        <div id="goal_wrapper">
+            <span id="goal"> {{ work_percent }}% of the way to {{ goal }} hours </span>
+        </div>
+        <div id="start_timer">
+            <span class="material-icons md-125 md-bf">timer</span>
+        </div>
+        <div id="stop_timer" class="noshow">
+            <span class="material-icons md-125 md-bf">timer_off</span>
+        </div>
+        <div id="chart">
+            CHART HERE
+        </div>
     </div>
 </div>
 {% endblock %}
