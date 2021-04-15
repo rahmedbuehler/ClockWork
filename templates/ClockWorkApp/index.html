@@ -56,16 +56,17 @@
     </div>
     <div class="right-column noselect">
         <div id="goal_wrapper">
-            <span id="goal"> {{ work_percent }}% of the way to {{ goal }} hours </span>
+            <span id="goal"> {{ hours_worked }} / {{ goal }} Hours </span>
+        </div>
+        <div id ="goal_percent">
+            {{ goal_percent }}%
         </div>
         <div id="start_timer" onclick="start_timer();">
             <span class="material-icons md-125 md-bf">timer</span>
         </div>
-        <div id="stop_timer" class="noshow" onclick="document.getElementById('form_id').submit();">
+        <div id="stop_timer" class="noshow" onclick="stop_timer();">
             <span class="material-icons md-125 md-bf">timer_off</span>
-        </div>
-        <div id="chart">
-            CHART HERE
+            <div id="stopwatch"> +00:00.00 </div>
         </div>
     </div>
     <form id="form_id" method="POST" action="">
@@ -79,12 +80,41 @@
 
 {% block scripts %}
     <script>
+        var start_timer_btn = document.getElementById("start_timer");
+        var stop_timer_btn = document.getElementById("stop_timer");
+        var stopwatch = document.getElementById("stopwatch");
+        var tenth_count = 0;
         function start_timer(){
             let start = new Date();
             document.getElementById("start_time_input").value = start.getHours()+":"+start.getMinutes();
             document.getElementById("start_day_input").value = start.getDate();
-            document.getElementById("start_timer").classList.add("noshow");
-            document.getElementById("stop_timer").classList.remove("noshow");
+            start_timer_btn.classList.add("noshow");
+            stop_timer_btn.classList.remove("noshow");
+            return setInterval(update_stopwatch, 100);
+        }
+        function stop_timer(){
+            stop_timer_btn.classList.add("noshow");
+            start_timer_btn.classList.remove("noshow");
+            document.getElementById('form_id').submit();
+        }
+        function update_stopwatch(){
+            tenth_count++;
+            var hours = Math.floor(tenth_count/3600);
+            var remain = tenth_count - hours*3600;
+            var minutes = Math.floor(remain/600);
+            remain -= minutes*600;
+            var seconds = Math.floor(remain/10);
+            remain -= seconds*10;
+            if (hours<10){
+                hours = "0"+hours;
+            }
+            if (minutes<10){
+                minutes = "0"+minutes;
+            }
+            if (seconds<10){
+                seconds = "0"+seconds;
+            }
+            stopwatch.innerHTML = "+"+hours+":"+minutes+":"+seconds+"."+remain;
         }
     </script>
 {% endblock %}

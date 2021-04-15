@@ -14,6 +14,8 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse('logout'))
 
+# Add Chart
+# Add timer
 class Index_view(View):
 
     def get_current_week(self, user):
@@ -47,7 +49,8 @@ class Index_view(View):
         context["date_list"] = [date.strftime("%m/%d") for date in current_week.date_list]
         context["week_by_row"] = current_week.get_week_by_row()
         context["goal"] = current_week.goal
-        context["work_percent"] = current_week.get_hours_worked() / current_week.goal
+        context["hours_worked"] = int(round(current_week.get_hours_worked()))
+        context["goal_percent"] = current_week.get_hours_worked()/current_week.goal
         return render(request, "ClockWorkApp/index.html", context)
 
     def post(self, request):
@@ -58,7 +61,7 @@ class Index_view(View):
                 current_day = Day.objects.filter(week=current_week, date=timezone.localdate()).first()
                 start_index = request.POST["start_time"].split(":")
                 start_index = int(start_index[0])*4+int(start_index[-1])//15
-                end_index = 1+now.hour*4+now.minute//15
+                end_index = now.hour*4+now.minute//15
                 current_day.work = current_day.work[0:start_index]+request.POST["work_code"]*(end_index-start_index)+current_day.work[end_index:]
                 current_day.save()
             elif str(timezone.localdate().day+1) == request.POST["start_day"]:
@@ -71,7 +74,7 @@ class Index_view(View):
                 start_index = request.POST["start_time"].split(":")
                 start_index = int(start_index[0])*4+int(start_index[-1])//15
                 day_1.work = day_1.work[0:start_index]+request.POST["work_code"]*(96-start_index)
-                end_index = 1+now.hour*4+now.minute//15
+                end_index = now.hour*4+now.minute//15
                 day_2.work = request.POST["work_code"]*(end_index)+day_2.work[end_index:]
                 day_1.save()
                 day_2.save()

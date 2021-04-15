@@ -139,29 +139,25 @@ td.color_1{
     background-color: rgb(116,195,101);
 }
 
-#goal-wrapper{
-}
-
-#goal{
+#goal, #goal_percent{
     font-weight: 900;
-    font-size: 28px;
+    font-size: 56px;
     text-align: center;
 }
 
 #start_timer, #stop_timer{
-    height: 22.5vh;
-    line-height:22.5vh;
     text-align: center;
 }
 
 .material-icons.md-125 { font-size: 125px; }
 .material-icons.md-bf { font-weight: 600; }
 
-#chart{
-    height: 45vh;
-    background-color: blue;
+#stopwatch{
+    display: inline-block;
+    color: rgb(116, 195, 101);
+    font-weight: 900;
+    width: 10%;
 }
-
 
 .footer {
     position: absolute;
