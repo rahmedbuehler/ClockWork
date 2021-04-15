@@ -99,8 +99,8 @@
         }
         function update_stopwatch(){
             tenth_count++;
-            var hours = Math.floor(tenth_count/3600);
-            var remain = tenth_count - hours*3600;
+            var hours = Math.floor(tenth_count/36000);
+            var remain = tenth_count - hours*36000;
             var minutes = Math.floor(remain/600);
             remain -= minutes*600;
             var seconds = Math.floor(remain/10);

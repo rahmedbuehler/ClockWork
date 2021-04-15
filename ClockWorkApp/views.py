@@ -25,10 +25,10 @@ class Index_view(View):
         if not current_week or today not in current_week.date_list:
             current_week = user.profile.add_week()
         # current_week exists, but no day object for today
-        elif current_week.date_list[today.weekday()] == None:
+        elif current_week.get_day_list()[today.weekday()] == None:
             current_week.add_day(today)
         return current_week
-    
+
     def get(self, request):
         context = {}
         # Login as guest if not already authenticated
@@ -50,18 +50,18 @@ class Index_view(View):
         context["week_by_row"] = current_week.get_week_by_row()
         context["goal"] = current_week.goal
         context["hours_worked"] = int(round(current_week.get_hours_worked()))
-        context["goal_percent"] = current_week.get_hours_worked()/current_week.goal
+        context["goal_percent"] = round(current_week.get_hours_worked()/current_week.goal,2)
         return render(request, "ClockWorkApp/index.html", context)
 
     def post(self, request):
         if request.POST["start_time"]:
             current_week = self.get_current_week(request.user)
             now = timezone.localtime()
+            start_index = request.POST["start_time"].split(":")
+            start_index = int(start_index[0])*4+round(int(start_index[-1])/15)
+            end_index = now.hour*4+round(now.minute/15)
             if str(timezone.localdate().day) == request.POST["start_day"]:
-                current_day = Day.objects.filter(week=current_week, date=timezone.localdate()).first()
-                start_index = request.POST["start_time"].split(":")
-                start_index = int(start_index[0])*4+int(start_index[-1])//15
-                end_index = now.hour*4+now.minute//15
+                current_day = current_week.get_day_list()[timezone.localtime().weekday()]
                 current_day.work = current_day.work[0:start_index]+request.POST["work_code"]*(end_index-start_index)+current_day.work[end_index:]
                 current_day.save()
             elif str(timezone.localdate().day+1) == request.POST["start_day"]:
@@ -71,10 +71,7 @@ class Index_view(View):
                     day_1 = current_week.previous.get_day_list()[-1]
                 else:
                     day_1 = current_week.get_day_list()[day_2.weekday()-1]
-                start_index = request.POST["start_time"].split(":")
-                start_index = int(start_index[0])*4+int(start_index[-1])//15
                 day_1.work = day_1.work[0:start_index]+request.POST["work_code"]*(96-start_index)
-                end_index = now.hour*4+now.minute//15
                 day_2.work = request.POST["work_code"]*(end_index)+day_2.work[end_index:]
                 day_1.save()
                 day_2.save()

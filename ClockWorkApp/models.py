@@ -77,7 +77,7 @@ class Week (models.Model):
         return hours
 
     def add_day (self, date):
-        Day.objects.create(date=date, week=self)
+        day = Day.objects.create(date=date, week=self)
 
     def get_week_by_row(self):
         '''
@@ -89,7 +89,7 @@ class Week (models.Model):
         '''
         rows = []
         work_list = self.get_work_list()
-        row_index_cutoff = (timezone.localtime().hour*4)+(timezone.localtime().minute//15)
+        row_index_cutoff = (timezone.localtime().hour*4)+round(timezone.localtime().minute/15)
         # Current Week
         day_index_cutoff = timezone.localdate().weekday()
         # Future Week
@@ -106,7 +106,7 @@ class Week (models.Model):
             for day_index in range(7):
                 if day_index > day_index_cutoff and work_list[day_index][row_index] == "0":
                     row.append("color_-1")
-                elif day_index == day_index_cutoff and row_index > row_index_cutoff and work_list[day_index][row_index] == "0":
+                elif day_index == day_index_cutoff and row_index >= row_index_cutoff and work_list[day_index][row_index] == "0":
                     row.append("color_-1")
                 else:
                     row.append("color_"+work_list[day_index][row_index])
