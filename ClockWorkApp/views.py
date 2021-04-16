@@ -10,12 +10,6 @@ GUEST_PASSWORD = os.environ["GUEST_PASSWORD"]
 
 from .models import *
 
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse('logout'))
-
-# Add Chart
-# Add timer
 class Index_view(View):
 
     def get_current_week(self, user):
@@ -50,7 +44,7 @@ class Index_view(View):
         context["week_by_row"] = current_week.get_week_by_row()
         context["goal"] = current_week.goal
         context["hours_worked"] = int(round(current_week.get_hours_worked()))
-        context["goal_percent"] = round(current_week.get_hours_worked()/current_week.goal,2)
+        context["goal_percent"] = round(100*(current_week.get_hours_worked()/current_week.goal),2)
         return render(request, "ClockWorkApp/index.html", context)
 
     def post(self, request):
@@ -76,17 +70,6 @@ class Index_view(View):
                 day_1.save()
                 day_2.save()
             return HttpResponseRedirect(reverse("index"))
-'''
+
 def new_account_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save() username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect(reverse('index'))
-    else:
-        form = UserCreationForm()
-    return render(request, 'ClockWorkApp/new_account.html', {'form': form})
-    '''
+    return render(request, 'ClockWorkApp/new_account.html', {})
