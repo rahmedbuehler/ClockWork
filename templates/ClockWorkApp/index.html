@@ -2,15 +2,14 @@
 
 {% load static %}
 
+{% block head-add %}
+    <link rel="icon" href="{% static 'schedule.png' %}" type="image/png">
+{% endblock %}
+
 {% block header %}
     <div id="title" class="title noselect">
         Cl<span id="header-icon" class="material-icons md-bf">schedule</span>ckWork
-        <div id="login_btn" class="btn-wrapper-right {{ login_display }}">
-            Login <span class="material-icons md-bf">login</span>
-        </div>
-        <div id="settings_btn" class="btn-wrapper-right {{ user_display }}">
-            {{ user.username }} <span class="material-icons md-bf">settings</span>
-        </div>
+        {% include header_btn_template %}
     </div>
 {% endblock %}
 
@@ -70,23 +69,13 @@
         </div>
     </div>
 </div>
-<form id="form_id" method="POST" action="">
+<form id="timer_form" method="POST" action="">
     {% csrf_token %}
     <input id="start_time_input" type="hidden" name="start_time" value="">
     <input id="start_day_input" type="hidden" name="start_day" value="">
     <input id="work_code_input" type="hidden" name="work_code" value="1">
-
-<div id="settings_border" class="popup_border">
-    <div id="settings" class="popup">
-        <div id="settings_title" class="header-wrapper title noselect">
-            Settings
-            <div class="btn-wrapper-right" onclick="document.getElementById('settings_border').classList.toggle('noshow');">
-                <span class="material-icons">cancel</span>
-            </div>
-        </div>
-    </div>
-</div>
 </form>
+{% include popup_template %}
 {% endblock %}
 
 {% block scripts %}
@@ -126,6 +115,12 @@
                 seconds = "0"+seconds;
             }
             stopwatch.innerHTML = "+"+hours+":"+minutes+":"+seconds+"."+remain;
+        }
+    </script>
+    <script>
+        function swap_popup(){
+            document.getElementById("popup").classList.toggle("noshow");
+            document.getElementById("alt_popup").classList.toggle("noshow");
         }
     </script>
 {% endblock %}

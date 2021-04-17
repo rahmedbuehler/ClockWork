@@ -1,0 +1,44 @@
+<div id="popup_border" class="popup_border noshow">
+    <div id="popup" class="popup">
+        <div id="popup_title" class="header-wrapper title noselect">
+            Login
+            <div class="btn-wrapper-right" onclick="document.getElementById('popup_border').classList.toggle('noshow');">
+                <span class="material-icons">cancel</span>
+            </div>
+        </div>
+        <div class="popup_body fieldWrapper">
+            <form id="login_form" method="POST" action="">
+            {% csrf_token %}
+            {% if auth_form.errors %}
+                <p class="error">Username and password didn't match.</p>
+            {% endif %}
+            {% for field in auth_form %}
+                {{ field.errors }}
+                {{ field }}
+            {% endfor %}
+            <input type="submit" class="submit_btn" name="login" value="Sign In">
+            <div id="create_account_btn" class="popup_btn noselect" onclick="swap_popup();"> Create an account instead?</div>
+            </form>
+        </div>
+    </div>
+    <div id="alt_popup" class="popup noshow">
+        <div id="popup_title" class="header-wrapper title noselect">
+            Create an Account
+            <div class="btn-wrapper-right" onclick="document.getElementById('popup_border').classList.toggle('noshow');">
+                <span class="material-icons">cancel</span>
+            </div>
+        </div>
+        <div class="popup_body fieldWrapper">
+            <form id="create_form" method="POST" action="">
+            {% csrf_token %}
+            {% for field in create_form %}
+                {{ field.errors }}
+                {{ field }}
+            {% endfor %}
+            <input type="submit" class="submit_btn" name="create" value="Register">
+            <div id="login_btn" class="popup_btn noselect" onclick="swap_popup();"> Login instead?</div>
+            </form>
+        </div>
+    </div>
+</div>
+

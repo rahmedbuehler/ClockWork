@@ -4,11 +4,14 @@ from django.urls import reverse
 from django.contrib.auth import login, authenticate, logout
 from django.utils import timezone
 from django.views import View
+from django.contrib import messages
 import os
 import pytz
+
 GUEST_PASSWORD = os.environ["GUEST_PASSWORD"]
 
 from .models import *
+from .forms import *
 
 class Index_view(View):
 
@@ -23,8 +26,8 @@ class Index_view(View):
             current_week.add_day(today)
         return current_week
 
-    def get(self, request):
-        context = {}
+    def get(self, request, auth_form=Authentication_Form(), create_form=User_Creation_Form(), settings_form=Settings_Form()):
+        context = {"auth_form":auth_form, "create_form":create_form, "settings_form":settings_form}
         # Login as guest if not already authenticated
         if not request.user.is_authenticated:
             user = authenticate(request, username="guest", password=GUEST_PASSWORD)
@@ -34,11 +37,11 @@ class Index_view(View):
             user = request.user
         # Show login if guest; account name and settings otherwise
         if user.username == "guest":
-            context["login_display"] = "show"
-            context["user_display"] = "noshow"
+            context["header_btn_template"] = "ClockWorkApp/login.html"
+            context["popup_template"] = "ClockWorkApp/login_popup.html"
         else:
-            context["login_display"] = "noshow"
-            context["user_display"] = "show"
+            context["header_btn_template"] = "ClockWorkApp/user.html"
+            context["popup_template"] = "ClockWorkApp/settings_popup.html"
         current_week = self.get_current_week(user)
         context["date_list"] = [date.strftime("%m/%d") for date in current_week.date_list]
         context["week_by_row"] = current_week.get_week_by_row()
@@ -48,7 +51,40 @@ class Index_view(View):
         return render(request, "ClockWorkApp/index.html", context)
 
     def post(self, request):
-        if request.POST["start_time"]:
+        auth_form = None
+        create_form = None
+        settings_form = None
+        # Login Attempt
+        if request.POST.get("login",False):
+            auth_form = Authentication_Form(request=request, data=request.POST)
+            if auth_form.is_valid() and auth_form.user_cache is not None:
+                login(request,auth_form.user_cache)
+                messages.success(request, 'Success!')
+                settings_form = Settings_Form()
+                auth_form = None
+            else:
+                create_form = User_Creation_Form()
+        # Account Creation Attempt
+        elif request.POST.get("create", False):
+            create_form = User_Creation_Form(request.POST)
+            if create_form.is_valid():
+                user = create_form.save()
+                login(request, user)
+                messages.success(request, 'Success!')
+                settings_form = Settings_Form()
+                create_form = None
+            else:
+                auth_form = Authentication_Form()
+        # Modify Settings Attempt
+        elif request.POST.get("settings",False):
+            settings_form = Settings_Form(request.POST)
+            if settings_form.is_valid():
+                settings_form.save()
+                messages.success(request, 'Success!')
+                settings_form = None
+        # This added a block
+        # Timer Start and Stop
+        elif request.POST["start_time"] and request.POST["stop_time"]:
             current_week = self.get_current_week(request.user)
             now = timezone.localtime()
             start_index = request.POST["start_time"].split(":")
@@ -69,7 +105,4 @@ class Index_view(View):
                 day_2.work = request.POST["work_code"]*(end_index)+day_2.work[end_index:]
                 day_1.save()
                 day_2.save()
-            return HttpResponseRedirect(reverse("index"))
-
-def new_account_view(request):
-    return render(request, 'ClockWorkApp/new_account.html', {})
+        return self.get(request, auth_form=auth_form, create_form=create_form, settings_form=settings_form)

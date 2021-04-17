@@ -1,0 +1,21 @@
+<div id="popup_border" class="popup_border noshow">
+    <div id="popup" class="popup">
+        <div id="popup_title" class="header-wrapper title noselect">
+            Settings
+            <div class="btn-wrapper-right" onclick="document.getElementById('popup_border').classList.toggle('noshow');">
+                <span class="material-icons">cancel</span>
+            </div>
+        </div>
+        <div class="popup_body fieldWrapper">
+            <form id="timer_form" method="POST" action="">
+                {% csrf_token %}
+                {% for field in settings_form %}
+                    {{ field.errors }}
+                    {{ field }}
+                {% endfor %}
+                <input type="submit" class="popup_btn" name="settings" value="Save">
+            </form>
+        </div>
+    </div>
+</div>
+

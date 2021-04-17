@@ -142,6 +142,7 @@ td.color_1{
 
 #start_timer, #stop_timer{
     text-align: center;
+    cursor: pointer;
 }
 
 .material-icons.md-125 { font-size: 125px; }
@@ -161,16 +162,51 @@ td.color_1{
     left:0;
     width:100%;
     height: 100%;
-    padding: 10%;
+    padding: 10% 40%;
     background-color: rgba(255,153,0,.75);
 }
 
 .popup{
     font-size: 36px;
     font-weight: 900;
-    height: 100%;
-    width: 100%;
     background-color: white;
+    border: 1px outset black;
+    box-shadow: 2px 2px 5px 3px;
+    padding-bottom: 1rem;
+}
+
+.popup input{
+    width: calc(100% - 2rem);
+    margin-left:1rem;
+    margin-right:1rem;
+}
+
+.submit_btn{
+    background-color: #FF9900;
+    border:4px solid #FF9900;
+    color: black;
+    cursor: pointer;
+}
+
+.popup_btn{
+    border:4px solid #FF9900;
+    margin: 1rem 1rem 0rem 1rem;
+    color: black;
+    background-color: #FF9900;
+    font-size: 14px;
+    text-align: center;
+    font-family: sans-serif;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.error, .errorlist{
+    font-size: 14px;
+    font-weight: normal;
+    color: red;
+}
+.error{
+    text-align: center;
 }
 
 .footer {
