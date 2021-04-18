@@ -136,8 +136,8 @@ class Profile (models.Model):
     timezone = models.CharField(max_length=32, choices=TIMEZONE_CHOICES, default="UTC")
     TIMES = ["12am"]+[str(i)+"am" for i in range(1,12)]+["12pm"]+[str(i)+"pm" for i in range(1,12)]
     TIME_CHOICES = tuple(zip(range(0,24),TIMES))
-    day_start_time = models.CharField(max_length=4, choices=TIME_CHOICES, default="5am")
-    day_end_time = models.CharField(max_length=4, choices=TIME_CHOICES, default="10pm")
+    day_start_time = models.PositiveSmallIntegerField(choices=TIME_CHOICES, default=4, validators=[MaxValueValidator(23)])
+    day_end_time = models.PositiveSmallIntegerField(choices=TIME_CHOICES, default=22, validators=[MaxValueValidator(23)])
     default_goal = models.PositiveSmallIntegerField(default=40, validators=[MinValueValidator(0), MaxValueValidator(168)])
 
     def add_week(self):

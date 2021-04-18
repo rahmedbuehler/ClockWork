@@ -1,5 +1,5 @@
-<div id="popup_border" class="popup_border noshow">
-    <div id="popup" class="popup">
+<div id="popup_border" class="popup_border {{ popup_display }}">
+    <div id="popup" class="popup {{ multi_form_display.0 }}">
         <div id="popup_title" class="header-wrapper title noselect">
             Login
             <div class="btn-wrapper-right" onclick="document.getElementById('popup_border').classList.toggle('noshow');">
@@ -21,7 +21,7 @@
             </form>
         </div>
     </div>
-    <div id="alt_popup" class="popup noshow">
+    <div id="alt_popup" class="popup {{ multi_form_display.1 }}">
         <div id="popup_title" class="header-wrapper title noselect">
             Create an Account
             <div class="btn-wrapper-right" onclick="document.getElementById('popup_border').classList.toggle('noshow');">

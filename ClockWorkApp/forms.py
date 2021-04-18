@@ -34,13 +34,23 @@ class Authentication_Form(AuthenticationForm):
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
  
 class Settings_Form(forms.ModelForm):
+    current_goal = forms.IntegerField(widget=forms.NumberInput(attrs={'size':2}), validators=[MinValueValidator(0), MaxValueValidator(168)])
 
     class Meta:
         model = Profile
         fields = ["default_goal", "timezone", "day_start_time", "day_end_time"]
         widgets = {
-                "default_goal":forms.NumberInput(attrs={'placeholder':"Default Weekly Goal"}),
-                "timezone":forms.Select(attrs={'placeholder':"Timezone"}),
-                "day_start_time":forms.Select(attrs={'placeholder':"Daily Start Time"}),
-                "day_end_time":forms.Select(attrs={'placeholder':"Daily End Time"})
+                "default_goal":forms.NumberInput(attrs={'size':2})
                 }
+
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        instance = kwargs.get("instance",None)
+        if instance is not None:
+            self.fields["current_goal"].initial = instance.latest_week.goal
+
+    def save(self, *args, **kwargs):
+        profile = super(forms.ModelForm, self).save(*args, **kwargs)
+        profile.latest_week.goal = self.cleaned_data["current_goal"]
+        profile.latest_week.save(update_fields=["goal"])
+        return profile

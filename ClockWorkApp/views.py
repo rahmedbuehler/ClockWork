@@ -13,6 +13,13 @@ GUEST_PASSWORD = os.environ["GUEST_PASSWORD"]
 from .models import *
 from .forms import *
 
+# Animation
+# Sound
+# Flexible row counts
+    # Standardize access to indices
+    # Make sure profile is read for this
+# Make sure start < end on settings/profile
+
 class Index_view(View):
 
     def get_current_week(self, user):
@@ -42,6 +49,17 @@ class Index_view(View):
         else:
             context["header_btn_template"] = "ClockWorkApp/user.html"
             context["popup_template"] = "ClockWorkApp/settings_popup.html"
+        # Settings default to user's profile unless form is bound or None
+        if settings_form is not None and not settings_form.is_bound:
+            context["settings_form"] = Settings_Form(instance=user.profile)
+        # Show popup if any form is bound; if multiple forms, make the bound one visible.
+        context["popup_display"] = "noshow"
+        context["multi_form_display"] = ["","noshow"]
+        if (settings_form is not None and settings_form.is_bound) or (auth_form is not None and auth_form.is_bound):
+            context["popup_display"] = ""
+        elif create_form is not None and create_form.is_bound:
+            context["popup_display"] = ""
+            context["multi_form_display"] = ["noshow",""]
         current_week = self.get_current_week(user)
         context["date_list"] = [date.strftime("%m/%d") for date in current_week.date_list]
         context["week_by_row"] = current_week.get_week_by_row()
@@ -60,7 +78,7 @@ class Index_view(View):
             if auth_form.is_valid() and auth_form.user_cache is not None:
                 login(request,auth_form.user_cache)
                 messages.success(request, 'Success!')
-                settings_form = Settings_Form()
+                settings_form = Settings_Form(instance=auth_form.user_cache.profile)
                 auth_form = None
             else:
                 create_form = User_Creation_Form()
@@ -71,17 +89,17 @@ class Index_view(View):
                 user = create_form.save()
                 login(request, user)
                 messages.success(request, 'Success!')
-                settings_form = Settings_Form()
+                settings_form = Settings_Form(instance=user.profile)
                 create_form = None
             else:
                 auth_form = Authentication_Form()
         # Modify Settings Attempt
         elif request.POST.get("settings",False):
-            settings_form = Settings_Form(request.POST)
+            settings_form = Settings_Form(instance=request.user.profile, data=request.POST)
             if settings_form.is_valid():
                 settings_form.save()
                 messages.success(request, 'Success!')
-                settings_form = None
+                settings_form = Settings_Form()
         # This added a block
         # Timer Start and Stop
         elif request.POST["start_time"] and request.POST["stop_time"]:
@@ -105,4 +123,8 @@ class Index_view(View):
                 day_2.work = request.POST["work_code"]*(end_index)+day_2.work[end_index:]
                 day_1.save()
                 day_2.save()
+            return self.get(request)
+        # Shouldn't trigger in normal navigation
+        else:
+            return self.get(request)
         return self.get(request, auth_form=auth_form, create_form=create_form, settings_form=settings_form)

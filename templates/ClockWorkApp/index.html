@@ -54,11 +54,8 @@
         </table>
     </div>
     <div class="right-column noselect">
-        <div id="goal_wrapper">
-            <span id="goal"> {{ hours_worked }} / {{ goal }} Hours </span>
-        </div>
-        <div id ="goal_percent">
-            {{ goal_percent }}%
+        <div id="goal">
+            {{ hours_worked }} / {{ goal }} Hours
         </div>
         <div id="start_timer" onclick="start_timer();">
             <span class="material-icons md-125 md-bf">timer</span>
@@ -67,7 +64,10 @@
             <span class="material-icons md-125 md-bf">timer_off</span>
             <div id="stopwatch"> +00:00.00 </div>
         </div>
-    </div>
+        <div id ="goal_percent">
+            {{ goal_percent }}%
+        </div>
+   </div>
 </div>
 <form id="timer_form" method="POST" action="">
     {% csrf_token %}

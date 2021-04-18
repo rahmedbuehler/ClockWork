@@ -1,4 +1,4 @@
-<div id="popup_border" class="popup_border noshow">
+<div id="popup_border" class="popup_border {{ popup_display }}">
     <div id="popup" class="popup">
         <div id="popup_title" class="header-wrapper title noselect">
             Settings
@@ -7,12 +7,26 @@
             </div>
         </div>
         <div class="popup_body fieldWrapper">
-            <form id="timer_form" method="POST" action="">
+            <form id="settings_form" method="POST" action="">
                 {% csrf_token %}
-                {% for field in settings_form %}
-                    {{ field.errors }}
-                    {{ field }}
-                {% endfor %}
+                {{ settings_form.current_goal.errors }}
+                <div class="form_normal">
+                This Week's Goal: {{ settings_form.current_goal }}
+                </div>
+                {{ settings_form.default_goal.errors }}
+                <div class="form_normal">
+                Default Goal: {{ settings_form.default_goal }}
+                </div>
+                {{ settings_form.timezone.errors }}
+                <div class="form_normal">
+                Timezone: {{ settings_form.timezone }}
+                </div>
+                {{ settings_form.day_start_time.errors }}
+                {{ settings_form.day_end_time.errors }}
+                <div class="form_normal flex_between">
+                    <span>Start: {{ settings_form.day_start_time }}</span>
+                    <span>End: {{ settings_form.day_end_time }}</span>
+                </div>
                 <input type="submit" class="popup_btn" name="settings" value="Save">
             </form>
         </div>
