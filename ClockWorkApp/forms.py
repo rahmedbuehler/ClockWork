@@ -34,7 +34,7 @@ class Authentication_Form(AuthenticationForm):
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
  
 class Settings_Form(forms.ModelForm):
-    current_goal = forms.IntegerField(widget=forms.NumberInput(attrs={'size':2}), validators=[MinValueValidator(0), MaxValueValidator(168)])
+    current_goal = forms.IntegerField(widget=forms.NumberInput(attrs={'size':2}), min_value=0, max_value=168) # Minimum and maximum hours in a week
 
     class Meta:
         model = Profile
@@ -48,6 +48,10 @@ class Settings_Form(forms.ModelForm):
         instance = kwargs.get("instance",None)
         if instance is not None and instance.latest_week:
             self.fields["current_goal"].initial = instance.latest_week.goal
+        elif instance is not None:
+            self.fields["current_goal"].initial = instance.default_goal
+        else:
+            self.fields["current_goal"].initial = 40
 
     def save(self, *args, **kwargs):
         profile = super(forms.ModelForm, self).save(*args, **kwargs)
@@ -62,3 +66,8 @@ class Settings_Form(forms.ModelForm):
 
         if day_start_time >= day_end_time:
             raise ValidationError("End time must be later than start time")
+
+class Timer_Form(forms.Form):
+    work_time = forms.IntegerField(required=False, min_value=0, widget=forms.HiddenInput())
+    work_code = forms.IntegerField(initial=1, min_value=0, widget=forms.HiddenInput())
+

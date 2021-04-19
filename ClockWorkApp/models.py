@@ -79,40 +79,6 @@ class Week (models.Model):
     def add_day (self, date):
         day = Day.objects.create(date=date, week=self)
 
-    def get_week_by_row(self):
-        '''
-        Returns a 96 by 8 list of lists where each of the 96 rows corresponds to a timeslot from the week.
-        The first entry in each row names the timeslot if it's on the hour (<None> otherwise) while the
-        remaining entries correspond to the days of the week (starting with Monday).  Finally, all work
-        identifiers are prepended with "color_" and future timeslots with identifier "0" are switched to
-        identifier "-1".
-        '''
-        rows = []
-        work_list = self.get_work_list()
-        row_index_cutoff = (timezone.localtime().hour*4)+round(timezone.localtime().minute/15)
-        # Current Week
-        day_index_cutoff = timezone.localdate().weekday()
-        # Future Week
-        if self.date_list[day_index_cutoff] > timezone.localdate():
-            day_index_cutoff = -1
-        # Past Week
-        elif self.date_list[day_index_cutoff] < timezone.localdate():
-            day_index_cutoff = 8
-        for row_index in range(96):
-            if row_index % 4 == 0:
-                row = [self.time_list[row_index//4]]
-            else:
-                row = [None]
-            for day_index in range(7):
-                if day_index > day_index_cutoff and work_list[day_index][row_index] == "0":
-                    row.append("color_-1")
-                elif day_index == day_index_cutoff and row_index >= row_index_cutoff and work_list[day_index][row_index] == "0":
-                    row.append("color_-1")
-                else:
-                    row.append("color_"+work_list[day_index][row_index])
-            rows.append(row)
-        return rows
-
 @receiver(pre_delete, sender=Week)
 def update_links (sender, instance, **kwargs):
     # Update previous/next pointers

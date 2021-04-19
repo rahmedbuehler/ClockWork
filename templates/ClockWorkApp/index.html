@@ -71,9 +71,7 @@
 </div>
 <form id="timer_form" method="POST" action="">
     {% csrf_token %}
-    <input id="start_time_input" type="hidden" name="start_time" value="">
-    <input id="start_day_input" type="hidden" name="start_day" value="">
-    <input id="work_code_input" type="hidden" name="work_code" value="1">
+    {{ timer_form }}
 </form>
 {% include popup_template %}
 {% endblock %}
@@ -82,21 +80,23 @@
     <script>
         var start_timer_btn = document.getElementById("start_timer");
         var stop_timer_btn = document.getElementById("stop_timer");
-        var stopwatch = document.getElementById("stopwatch");
-        var tenth_count = 0;
+        var start;
         function start_timer(){
-            let start = new Date();
-            document.getElementById("start_time_input").value = start.getHours()+":"+start.getMinutes();
-            document.getElementById("start_day_input").value = start.getDate();
+            start = new Date();
             start_timer_btn.classList.add("noshow");
             stop_timer_btn.classList.remove("noshow");
             return setInterval(update_stopwatch, 100);
         }
         function stop_timer(){
+            let end = new Date();
+            document.getElementById("id_work_time").value = Math.round((end.getTime() - start.getTime())/1000); // Ellapsed time in seconds
             stop_timer_btn.classList.add("noshow");
             start_timer_btn.classList.remove("noshow");
-            document.getElementById('form_id').submit();
+            document.getElementById("timer_form").submit();
         }
+
+        var tenth_count = 0;
+        var stopwatch = document.getElementById("stopwatch");
         function update_stopwatch(){
             tenth_count++;
             var hours = Math.floor(tenth_count/36000);
