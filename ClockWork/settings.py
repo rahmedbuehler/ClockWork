@@ -21,6 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 LOGIN_REDIRECT_URL = "index"
 AUTH_USER_MODEL = "ClockWorkApp.User"
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 # Application definition
 
