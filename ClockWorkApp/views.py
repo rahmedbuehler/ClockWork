@@ -13,12 +13,13 @@ GUEST_PASSWORD = os.environ["GUEST_PASSWORD"]
 from .models import *
 from .forms import *
 
-# Animation
+# Slot fill animation
+# Stopwatch animation
 # Sound
-# Flexible row counts
-    # Standardize access to indices
-    # Make sure profile is read for this
-# Make sure start < end on settings/profile
+# Standardize access to indices and num blocks per hour
+# Previous/Next Btns (add index to get)
+# Make POST not reset timer
+# Make timer inputs use form
 
 class Index_view(View):
 
@@ -28,10 +29,44 @@ class Index_view(View):
         # New User or new current_week
         if not current_week or today not in current_week.date_list:
             current_week = user.profile.add_week()
-        # current_week exists, but no day object for today
+        # Current_week exists, but no day object for today
         elif current_week.get_day_list()[today.weekday()] == None:
             current_week.add_day(today)
         return current_week
+
+    def get_week_by_row(self, week):
+        '''
+        Returns a 96 by 8 list of lists where each of the 96 rows corresponds to a timeslot from the week.
+        The first entry in each row names the timeslot if it's on the hour (<None> otherwise) while the
+        remaining entries correspond to the days of the week (starting with Monday).  Finally, all work
+        identifiers are prepended with "color_" and future timeslots with identifier "0" are switched to
+        identifier "-1".
+        '''
+        rows = []
+        work_list = week.get_work_list()
+        row_index_cutoff = (timezone.localtime().hour*4)+round(timezone.localtime().minute/15)
+        # Current Week
+        day_index_cutoff = timezone.localdate().weekday()
+        # Future Week
+        if week.date_list[day_index_cutoff] > timezone.localdate():
+            day_index_cutoff = -1
+        # Past Week
+        elif week.date_list[day_index_cutoff] < timezone.localdate():
+            day_index_cutoff = 8
+        for row_index in range(96):
+            if row_index % 4 == 0:
+                row = [week.time_list[row_index//4]]
+            else:
+                row = [None]
+            for day_index in range(7):
+                if day_index > day_index_cutoff and work_list[day_index][row_index] == "0":
+                    row.append("color_-1")
+                elif day_index == day_index_cutoff and row_index >= row_index_cutoff and work_list[day_index][row_index] == "0":
+                    row.append("color_-1")
+                else:
+                    row.append("color_"+work_list[day_index][row_index])
+            rows.append(row)
+        return rows
 
     def get(self, request, auth_form=Authentication_Form(), create_form=User_Creation_Form(), settings_form=Settings_Form()):
         context = {"auth_form":auth_form, "create_form":create_form, "settings_form":settings_form}
@@ -52,7 +87,7 @@ class Index_view(View):
         # Settings default to user's profile unless form is bound or None
         if settings_form is not None and not settings_form.is_bound:
             context["settings_form"] = Settings_Form(instance=user.profile)
-        # Show popup if any form is bound; if multiple forms, make the bound one visible.
+        # Show popup if any form is bound; if multiple forms on the page, make the bound one visible.
         context["popup_display"] = "noshow"
         context["multi_form_display"] = ["","noshow"]
         if (settings_form is not None and settings_form.is_bound) or (auth_form is not None and auth_form.is_bound):
@@ -60,9 +95,11 @@ class Index_view(View):
         elif create_form is not None and create_form.is_bound:
             context["popup_display"] = ""
             context["multi_form_display"] = ["noshow",""]
+        # Set standard display elements
         current_week = self.get_current_week(user)
         context["date_list"] = [date.strftime("%m/%d") for date in current_week.date_list]
-        context["week_by_row"] = current_week.get_week_by_row()
+        NUM_BLOCKS_PER_HOUR = 4
+        context["week_by_row"] = self.get_week_by_row(current_week)[NUM_BLOCKS_PER_HOUR*user.profile.day_start_time:NUM_BLOCKS_PER_HOUR*user.profile.day_end_time]
         context["goal"] = current_week.goal
         context["hours_worked"] = int(round(current_week.get_hours_worked()))
         context["goal_percent"] = round(100*(current_week.get_hours_worked()/current_week.goal),2)
@@ -100,7 +137,6 @@ class Index_view(View):
                 settings_form.save()
                 messages.success(request, 'Success!')
                 settings_form = Settings_Form()
-        # This added a block
         # Timer Start and Stop
         elif request.POST["start_time"] and request.POST["stop_time"]:
             current_week = self.get_current_week(request.user)

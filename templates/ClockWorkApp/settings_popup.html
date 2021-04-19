@@ -21,6 +21,7 @@
                 <div class="form_normal">
                 Timezone: {{ settings_form.timezone }}
                 </div>
+                {{ settings_form.non_field_errors }}
                 {{ settings_form.day_start_time.errors }}
                 {{ settings_form.day_end_time.errors }}
                 <div class="form_normal flex_between">

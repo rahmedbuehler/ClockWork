@@ -54,3 +54,11 @@ class Settings_Form(forms.ModelForm):
         profile.latest_week.goal = self.cleaned_data["current_goal"]
         profile.latest_week.save(update_fields=["goal"])
         return profile
+
+    def clean(self):
+        cleaned_data = super().clean()
+        day_start_time = cleaned_data.get("day_start_time")
+        day_end_time = cleaned_data.get("day_end_time")
+
+        if day_start_time >= day_end_time:
+            raise ValidationError("End time must be later than start time")

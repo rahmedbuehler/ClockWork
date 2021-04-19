@@ -31,6 +31,7 @@
         <div class="popup_body fieldWrapper">
             <form id="create_form" method="POST" action="">
             {% csrf_token %}
+            {{ create_form.non_field_errors }}
             {% for field in create_form %}
                 {{ field.errors }}
                 {{ field }}
