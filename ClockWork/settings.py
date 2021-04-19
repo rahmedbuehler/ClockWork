@@ -21,7 +21,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 LOGIN_REDIRECT_URL = "index"
 AUTH_USER_MODEL = "ClockWorkApp.User"
-LOGIN_URL ="/login/"
 
 # Application definition
 
@@ -134,12 +133,11 @@ else:
     DEBUG = True
 
 # Dev Settings
-from . import secret_settings
+#from . import secret_settings
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'Default Dummy Key')
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS','Default Dummy Host')]
 
-'''
 # Heroku: Update database configuration from $DATABASE_URL.
 import dj_database_url
 db_from_env = dj_database_url.config(conn_max_age=500)
@@ -148,4 +146,3 @@ DATABASES['default'].update(db_from_env)
 # Configure Django App for Heroku.
 import django_heroku
 django_heroku.settings(locals())
-'''
