@@ -46,7 +46,7 @@ class Settings_Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(forms.ModelForm, self).__init__(*args, **kwargs)
         instance = kwargs.get("instance",None)
-        if instance is not None:
+        if instance is not None and instance.latest_week:
             self.fields["current_goal"].initial = instance.latest_week.goal
 
     def save(self, *args, **kwargs):
