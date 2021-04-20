@@ -91,8 +91,9 @@ def update_links (sender, instance, **kwargs):
         instance.owner.profile.save()
 
 class Day (models.Model):
+    NUM_BLOCKS_PER_HOUR = 4
     date = models.DateField()
-    work = models.CharField(max_length=96, default = "0"*96, validators=[RegexValidator(regex='^\d{96}$', message='Length has to be 96 (4 fifteen minute blocks per hour * 24 hours)', code='nomatch')])
+    work = models.CharField(max_length=NUM_BLOCKS_PER_HOUR*24, default = "0"*(NUM_BLOCKS_PER_HOUR*24), validators=[RegexValidator(regex='^\d{'+str(NUM_BLOCKS_PER_HOUR*24)+'}$', message='Length has to be NUM_BLOCKS_PER_HOUR * 24 hours', code='nomatch')])
     week = models.ForeignKey(Week, related_name="days", on_delete = models.CASCADE)
 
 class Profile (models.Model):
@@ -102,6 +103,7 @@ class Profile (models.Model):
     timezone = models.CharField(max_length=32, choices=TIMEZONE_CHOICES, default="UTC")
     TIMES = ["12am"]+[str(i)+"am" for i in range(1,12)]+["12pm"]+[str(i)+"pm" for i in range(1,12)]
     TIME_CHOICES = tuple(zip(range(0,24),TIMES))
+    # Start and end hour (0-23)
     day_start_time = models.PositiveSmallIntegerField(choices=TIME_CHOICES, default=4, validators=[MaxValueValidator(23)])
     day_end_time = models.PositiveSmallIntegerField(choices=TIME_CHOICES, default=22, validators=[MaxValueValidator(23)])
     default_goal = models.PositiveSmallIntegerField(default=40, validators=[MinValueValidator(0), MaxValueValidator(168)])

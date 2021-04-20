@@ -17,13 +17,17 @@ from .forms import *
 # Stopwatch animation
 # Sound
 # Standardize access to indices and num blocks per hour
-# Previous/Next Btns (add index to get)
-# Make POST not reset timer
-# Make timer inputs use form
+# Previous/Next Btns (add week index to get)
+# Make POST not reset timer?
+# Have calendar expand with available space
 
 class Index_view(View):
 
     def get_current_week(self, user):
+        '''
+        Returns the current <Week> object, creating a new <Day> or <Week> if 
+        necessary.
+        '''
         today = timezone.localdate()
         current_week = user.profile.latest_week
         # New User or new current_week
@@ -36,7 +40,8 @@ class Index_view(View):
 
     def get_week_by_row(self, week):
         '''
-        Returns a 96 by 8 list of lists where each of the 96 rows corresponds to a timeslot from the week.
+        Returns a list of rows. Each row is a list of length 8 and corresponds to a timeslot from the
+        week, starting with the day_start_time and ending with the day_end_time from the user's profile.
         The first entry in each row names the timeslot if it's on the hour (<None> otherwise) while the
         remaining entries correspond to the days of the week (starting with Monday).  Finally, all work
         identifiers are prepended with "color_" and future timeslots with identifier "0" are switched to
@@ -44,8 +49,11 @@ class Index_view(View):
         '''
         rows = []
         work_list = week.get_work_list()
-        row_index_cutoff = (timezone.localtime().hour*4)+round(timezone.localtime().minute/15)
-        # Current Week
+        start_hour = week.owner.profile.day_start_time
+        end_hour = week.owner.profile.day_end_time
+        now = timezone.localtime()
+        row_index_cutoff = (now.hour*Day.NUM_BLOCKS_PER_HOUR)+round(now.minute/(60/Day.NUM_BLOCKS_PER_HOUR))-start_hour*Day.NUM_BLOCKS_PER_HOUR
+        # Check week to set day cutoff
         day_index_cutoff = timezone.localdate().weekday()
         # Future Week
         if week.date_list[day_index_cutoff] > timezone.localdate():
@@ -53,9 +61,9 @@ class Index_view(View):
         # Past Week
         elif week.date_list[day_index_cutoff] < timezone.localdate():
             day_index_cutoff = 8
-        for row_index in range(96):
-            if row_index % 4 == 0:
-                row = [week.time_list[row_index//4]]
+        for row_index in range(start_hour*Day.NUM_BLOCKS_PER_HOUR, end_hour*Day.NUM_BLOCKS_PER_HOUR):
+            if row_index % Day.NUM_BLOCKS_PER_HOUR == 0:
+                row = [week.time_list[row_index//Day.NUM_BLOCKS_PER_HOUR]]
             else:
                 row = [None]
             for day_index in range(7):
@@ -98,8 +106,7 @@ class Index_view(View):
         # Set standard display elements
         current_week = self.get_current_week(user)
         context["date_list"] = [date.strftime("%m/%d") for date in current_week.date_list]
-        NUM_BLOCKS_PER_HOUR = 4
-        context["week_by_row"] = self.get_week_by_row(current_week)[NUM_BLOCKS_PER_HOUR*user.profile.day_start_time:NUM_BLOCKS_PER_HOUR*user.profile.day_end_time]
+        context["week_by_row"] = self.get_week_by_row(current_week)
         context["goal"] = current_week.goal
         context["hours_worked"] = int(round(current_week.get_hours_worked()))
         context["goal_percent"] = round(100*(current_week.get_hours_worked()/current_week.goal),2)
