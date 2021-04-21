@@ -55,14 +55,15 @@
     </div>
     <div class="right-column noselect">
         <div id="goal">
-            {{ hours_worked }} / {{ goal }} Hours
+            {{ hours_worked }} / {{ goal }} Hrs
         </div>
         <div id="start_timer" onclick="start_timer();">
             <span class="material-icons md-125 md-bf">timer</span>
         </div>
         <div id="stop_timer" class="noshow" onclick="stop_timer();">
-            <span class="material-icons md-125 md-bf">timer_off</span>
-            <div id="stopwatch"> +00:00.00 </div>
+                <span class="material-icons md-125 md-bf">timer_off</span>
+                <div class="minute_spinner"></div>
+                <div class="second_spinner"></div>
         </div>
         <div id ="goal_percent">
             {{ goal_percent }}%
@@ -85,7 +86,6 @@
             start = new Date();
             start_timer_btn.classList.add("noshow");
             stop_timer_btn.classList.remove("noshow");
-            return setInterval(update_stopwatch, 100);
         }
         function stop_timer(){
             let end = new Date();
@@ -93,28 +93,6 @@
             stop_timer_btn.classList.add("noshow");
             start_timer_btn.classList.remove("noshow");
             document.getElementById("timer_form").submit();
-        }
-
-        var tenth_count = 0;
-        var stopwatch = document.getElementById("stopwatch");
-        function update_stopwatch(){
-            tenth_count++;
-            var hours = Math.floor(tenth_count/36000);
-            var remain = tenth_count - hours*36000;
-            var minutes = Math.floor(remain/600);
-            remain -= minutes*600;
-            var seconds = Math.floor(remain/10);
-            remain -= seconds*10;
-            if (hours<10){
-                hours = "0"+hours;
-            }
-            if (minutes<10){
-                minutes = "0"+minutes;
-            }
-            if (seconds<10){
-                seconds = "0"+seconds;
-            }
-            stopwatch.innerHTML = "+"+hours+":"+minutes+":"+seconds+"."+remain;
         }
     </script>
     <script>

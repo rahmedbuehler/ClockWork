@@ -148,16 +148,43 @@ td.color_1{
 #start_timer, #stop_timer{
     text-align: center;
     cursor: pointer;
+    position:relative;
+    height: 225px;
+    width: 225px;
+    line-height: 225px;
 }
 
 .material-icons.md-125 { font-size: 125px; }
 .material-icons.md-bf { font-weight: 600; }
 
-#stopwatch{
-    display: inline-block;
-    color: rgb(116, 195, 101);
-    font-weight: 900;
-    width: 10%;
+.minute_spinner {
+    position:absolute;
+    top:50%;
+    left:50%;
+    margin-left: -100px;
+    margin-top: -100px;
+    border: 2px solid white;
+    border-top: 2px solid #ff9900;
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    animation: spin 60s linear infinite;
+}
+
+.second_spinner {
+    position:absolute;
+    top:0;
+    left:0;
+    border: 2px solid white;
+    border-top: 2px solid #ff9900;
+    border-radius: 50%;
+    width: 225px;
+    height: 225px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .popup_border{
