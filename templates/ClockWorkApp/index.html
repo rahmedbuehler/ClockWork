@@ -76,7 +76,6 @@
 </form>
 {% include popup_template %}
 <audio id="block_audio" src="{% static 'block_audio' %}" preload="auto"></audio>
-<audio id="increment_audio" src="{% static 'increment_audio' %}" preload="auto"></audio>
 {% endblock %}
 
 {% block scripts %}
@@ -109,8 +108,6 @@
         const block_audio = document.getElementById("block_audio");
         block_audio.playbackRate = 1.2;
         block_audio.volume = .15;
-        const increment_audio = document.getElementById("increment_audio");
-        console.log(block_audio.playbackRate);
 
         function update_animation(){
             if (i < entry_list.length){

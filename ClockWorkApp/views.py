@@ -33,7 +33,7 @@ class Index_view(View):
             current_week.add_day(today)
         return current_week
 
-    def get_week_by_row(self, week, animate=True):
+    def get_week_by_row(self, week, animate=False):
         '''
         Returns a pair with the first element being a list of rows and the second element being a list of
         entry id's to animate.  Each row is a list of length 8 and corresponds to a timeslot from the
