@@ -79,10 +79,6 @@ class Index_view(View):
                 animate_list = ["entry_"+str(i)+"_"+str(day_index_cutoff+1)] + animate_list
                 rows[i][day_index_cutoff+1] = "color_-1"
                 i -= 1
-        print("Rows: ",rows)
-        print("animate_list: ",animate_list)
-        print("now: ", now)
-        print("ric: ",row_index_cutoff)
         return rows, animate_list
 
     def get(self, request, auth_form=Authentication_Form(), create_form=User_Creation_Form(), settings_form=Settings_Form()):
