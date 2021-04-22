@@ -48,7 +48,7 @@ class Index_view(View):
         start_hour = week.owner.profile.day_start_time
         end_hour = week.owner.profile.day_end_time
         now = timezone.localtime()
-        row_index_cutoff = (now.hour*Day.NUM_BLOCKS_PER_HOUR)+round(now.minute/(60/Day.NUM_BLOCKS_PER_HOUR))-start_hour*Day.NUM_BLOCKS_PER_HOUR
+        row_index_cutoff = (now.hour*Day.NUM_BLOCKS_PER_HOUR)+round(now.minute/(60/Day.NUM_BLOCKS_PER_HOUR))
         # Check week to set day cutoff
         day_index_cutoff = timezone.localdate().weekday()
         # Future Week
@@ -74,7 +74,7 @@ class Index_view(View):
         animate_list = []
         if animate and day_index_cutoff != -1 and day_index_cutoff != 8:
             # Build list of id's for blocks that will be animated and modify rows accordingly.
-            i = min(len(rows),row_index_cutoff)-1
+            i = min(len(rows),row_index_cutoff-start_hour*Day.NUM_BLOCKS_PER_HOUR)-1
             while i > -1 and rows[i][day_index_cutoff] != "color_0":
                 animate_list = ["entry_"+str(i)+"_"+str(day_index_cutoff+1)] + animate_list
                 rows[i][day_index_cutoff+1] = "color_-1"
