@@ -101,11 +101,11 @@ class Profile (models.Model):
     latest_week = models.OneToOneField(Week, on_delete = models.SET_NULL, null=True, blank=True)
     TIMEZONE_CHOICES = tuple(zip(pytz.common_timezones, pytz.common_timezones))
     timezone = models.CharField(max_length=32, choices=TIMEZONE_CHOICES, default="UTC")
-    TIMES = ["12am"]+[str(i)+"am" for i in range(1,12)]+["12pm"]+[str(i)+"pm" for i in range(1,12)]
-    TIME_CHOICES = tuple(zip(range(0,24),TIMES))
-    # Start and end hour (0-23)
-    day_start_time = models.PositiveSmallIntegerField(choices=TIME_CHOICES, default=4, validators=[MaxValueValidator(23)])
-    day_end_time = models.PositiveSmallIntegerField(choices=TIME_CHOICES, default=22, validators=[MaxValueValidator(23)])
+    TIMES = ["12am"]+[str(i)+"am" for i in range(1,12)]+["12pm"]+[str(i)+"pm" for i in range(1,12)]+["12am"]
+    TIME_CHOICES = tuple(zip(range(0,25),TIMES))
+    # Start and end hour (0-24) with 12am appearing as both 0 and 24
+    day_start_time = models.PositiveSmallIntegerField(choices=TIME_CHOICES, default=4, validators=[MaxValueValidator(24)])
+    day_end_time = models.PositiveSmallIntegerField(choices=TIME_CHOICES, default=22, validators=[MaxValueValidator(24)])
     default_goal = models.PositiveSmallIntegerField(default=40, validators=[MinValueValidator(0), MaxValueValidator(168)])
 
     def add_week(self):

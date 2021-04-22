@@ -134,7 +134,7 @@ else:
     DEBUG = True
 
 # Dev Settings
-from . import secret_settings
+#from . import secret_settings
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'Default Dummy Key')
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS','Default Dummy Host')]

@@ -13,12 +13,7 @@ GUEST_PASSWORD = os.environ["GUEST_PASSWORD"]
 from .models import *
 from .forms import *
 
-# Slot fill animation
-# Stopwatch animation
-# Sound
-# Standardize access to indices and num blocks per hour
 # Previous/Next Btns (add week index to get)
-# Make POST not reset timer?
 # Have calendar expand with available space
 
 class Index_view(View):
@@ -38,9 +33,10 @@ class Index_view(View):
             current_week.add_day(today)
         return current_week
 
-    def get_week_by_row(self, week):
+    def get_week_by_row(self, week, animate=True):
         '''
-        Returns a list of rows. Each row is a list of length 8 and corresponds to a timeslot from the
+        Returns a pair with the first element being a list of rows and the second element being a list of
+        entry id's to animate.  Each row is a list of length 8 and corresponds to a timeslot from the
         week, starting with the day_start_time and ending with the day_end_time from the user's profile.
         The first entry in each row names the timeslot if it's on the hour (<None> otherwise) while the
         remaining entries correspond to the days of the week (starting with Monday).  Finally, all work
@@ -67,14 +63,23 @@ class Index_view(View):
             else:
                 row = [None]
             for day_index in range(7):
-                if day_index > day_index_cutoff and work_list[day_index][row_index] == "0":
+                if day_index > day_index_cutoff:
                     row.append("color_-1")
-                elif day_index == day_index_cutoff and row_index >= row_index_cutoff and work_list[day_index][row_index] == "0":
+                elif day_index == day_index_cutoff and row_index >= row_index_cutoff:
                     row.append("color_-1")
                 else:
                     row.append("color_"+work_list[day_index][row_index])
             rows.append(row)
-        return rows
+
+        animate_list = []
+        if animate and day_index_cutoff != -1 and day_index_cutoff != 8:
+            # Build list of id's for blocks that will be animated and modify rows accordingly.
+            i = min(len(rows),row_index_cutoff)-1
+            while i > -1 and rows[i][day_index_cutoff] != "color_0":
+                animate_list = ["entry_"+str(i)+"_"+str(day_index_cutoff+1)] + animate_list
+                rows[i][day_index_cutoff+1] = "color_-1"
+                i -= 1
+        return rows, animate_list
 
     def get(self, request, auth_form=Authentication_Form(), create_form=User_Creation_Form(), settings_form=Settings_Form()):
         context = {"timer_form": Timer_Form(), "auth_form":auth_form, "create_form":create_form, "settings_form":settings_form}
@@ -106,10 +111,11 @@ class Index_view(View):
         # Set standard display elements
         current_week = self.get_current_week(user)
         context["date_list"] = [date.strftime("%m/%d") for date in current_week.date_list]
-        context["week_by_row"] = self.get_week_by_row(current_week)
+        context["week_by_row"], context["animate_list"] = self.get_week_by_row(current_week)
         context["goal"] = current_week.goal
         context["hours_worked"] = int(round(current_week.get_hours_worked()))
         context["goal_percent"] = round(100*(current_week.get_hours_worked()/current_week.goal),2)
+        context["animate_color"]= "color_1"
         return render(request, "ClockWorkApp/index.html", context)
 
     def post(self, request):
