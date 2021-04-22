@@ -33,7 +33,7 @@ class Index_view(View):
             current_week.add_day(today)
         return current_week
 
-    def get_week_by_row(self, week, animate=False):
+    def get_week_by_row(self, week, animate=True):
         '''
         Returns a pair with the first element being a list of rows and the second element being a list of
         entry id's to animate.  Each row is a list of length 8 and corresponds to a timeslot from the
@@ -79,6 +79,10 @@ class Index_view(View):
                 animate_list = ["entry_"+str(i)+"_"+str(day_index_cutoff+1)] + animate_list
                 rows[i][day_index_cutoff+1] = "color_-1"
                 i -= 1
+        print("Rows: ",rows)
+        print("animate_list: ",animate_list)
+        print("now: ", now)
+        print("ric: ",row_index_cutoff)
         return rows, animate_list
 
     def get(self, request, auth_form=Authentication_Form(), create_form=User_Creation_Form(), settings_form=Settings_Form()):
