@@ -110,6 +110,12 @@ class Index_view(View):
             context["multi_form_display"] = ["noshow",""]
         # Set standard display elements
         current_week = self.get_current_week(user)
+        ### TESTING
+        today = timezone.localdate()
+        day = current_week.get_day_list()[today.weekday()]
+        day.work = "0"*60+"1"*36
+        day.save()
+        ##############
         context["date_list"] = [date.strftime("%m/%d") for date in current_week.date_list]
         context["week_by_row"], context["animate_list"] = self.get_week_by_row(current_week)
         context["goal"] = current_week.goal

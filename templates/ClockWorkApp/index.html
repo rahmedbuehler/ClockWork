@@ -107,37 +107,34 @@
         var i = 0;
         const entry_list = {{ animate_list|safe }};
         const block_audio = document.getElementById("block_audio");
-        block_audio.playbackRate = 1.2;
-        block_audio.volume = .15;
+        block_audio.playbackRate = 2.5;
+        block_audio.volume = .05;
+
+        function swap_entry(id){
+            document.getElementById(id).classList.remove("color_-1");
+            document.getElementById(id).classList.add("{{ animate_color }}");
+        }
+
+        function nosound_update(){
+            while (i < entry_list.length-1) {
+                setTimeout(swap_entry, 250*i, entry_list[i]);
+                ++i;
+            }
+        }
 
         function update_animation(){
             if (i < entry_list.length){
                 if (i == entry_list.length-1){
-                    document.getElementById("block_audio_final").play();
-                } else {
-                    block_audio.play();
+                    block_audio.playbackRate = 1.25;
+                    block_audio.volume = .15;
                 }
-                document.getElementById(entry_list[i]).classList.remove("color_-1");
-                document.getElementById(entry_list[i]).classList.add("{{ animate_color }}");
+                block_audio.play().catch(() => {nosound_update();});
+                swap_entry(entry_list[i]);
                 ++i;
             }
         }
 
-        function update_animation_nosound(){
-            if (i < entry_list.length){
-                document.getElementById(entry_list[i]).classList.remove("color_-1");
-                document.getElementById(entry_list[i]).classList.add("{{ animate_color }}");
-                ++i;
-            }
-        }
-
-        try{
-            block_audio.addEventListener("ended", update_animation, false);
-            update_animation();
-        }
-        catch(err){
-            block_audio.addEventListener("ended", update_animation_nosound, false);
-            update_animation_nosound();
-        }
+        block_audio.addEventListener("ended", update_animation, false);
+        update_animation();
     </script>
 {% endblock %}
