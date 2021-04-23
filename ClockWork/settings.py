@@ -120,6 +120,9 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
+# Dev Settings
+# from . import secret_settings
+
 # Security
 DEBUG = os.getenv('DEBUG', 'FALSE')
 if DEBUG != 'TRUE':
@@ -132,9 +135,6 @@ if DEBUG != 'TRUE':
     DEBUG = False
 else:
     DEBUG = True
-
-# Dev Settings
-# from . import secret_settings
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'Default Dummy Key')
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS','Default Dummy Host')]
