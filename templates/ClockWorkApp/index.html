@@ -55,7 +55,7 @@
     </div>
     <div class="right-column noselect">
         <div id="goal">
-            {{ hours_worked }} / {{ goal }} Hrs
+            {{ hours_worked }} / {{ goal }} Hours
         </div>
         <div id="start_timer" onclick="start_timer();">
             <span class="material-icons md-125 md-bf">timer</span>
@@ -76,6 +76,7 @@
 </form>
 {% include popup_template %}
 <audio id="block_audio" src="{% static 'block_audio' %}" preload="auto"></audio>
+<audio id="block_audio_final" src="{% static 'block_audio_final' %}" preload="auto"></audio>
 {% endblock %}
 
 {% block scripts %}
@@ -111,14 +112,32 @@
 
         function update_animation(){
             if (i < entry_list.length){
-                block_audio.play();
+                if (i == entry_list.length-1){
+                    document.getElementById("block_audio_final").play();
+                } else {
+                    block_audio.play();
+                }
                 document.getElementById(entry_list[i]).classList.remove("color_-1");
                 document.getElementById(entry_list[i]).classList.add("{{ animate_color }}");
                 ++i;
             }
         }
 
-        block_audio.addEventListener("ended", update_animation, false);
-        update_animation();
+        function update_animation_nosound(){
+            if (i < entry_list.length){
+                document.getElementById(entry_list[i]).classList.remove("color_-1");
+                document.getElementById(entry_list[i]).classList.add("{{ animate_color }}");
+                ++i;
+            }
+        }
+
+        try{
+            block_audio.addEventListener("ended", update_animation, false);
+            update_animation();
+        }
+        catch(err){
+            block_audio.addEventListener("ended", update_animation_nosound, false);
+            update_animation_nosound();
+        }
     </script>
 {% endblock %}

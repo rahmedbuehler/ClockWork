@@ -75,7 +75,7 @@ class Index_view(View):
         if animate and day_index_cutoff != -1 and day_index_cutoff != 8:
             # Build list of id's for blocks that will be animated and modify rows accordingly.
             i = min(len(rows),row_index_cutoff-start_hour*Day.NUM_BLOCKS_PER_HOUR)-1
-            while i > -1 and rows[i][day_index_cutoff] != "color_0":
+            while i > -1 and rows[i][day_index_cutoff+1] != "color_0":
                 animate_list = ["entry_"+str(i)+"_"+str(day_index_cutoff+1)] + animate_list
                 rows[i][day_index_cutoff+1] = "color_-1"
                 i -= 1
@@ -114,7 +114,7 @@ class Index_view(View):
         context["week_by_row"], context["animate_list"] = self.get_week_by_row(current_week)
         context["goal"] = current_week.goal
         context["hours_worked"] = int(round(current_week.get_hours_worked()))
-        context["goal_percent"] = round(100*(current_week.get_hours_worked()/current_week.goal),2)
+        context["goal_percent"] = round(100*(current_week.get_hours_worked()/current_week.goal))
         context["animate_color"]= "color_1"
         return render(request, "ClockWorkApp/index.html", context)
 
